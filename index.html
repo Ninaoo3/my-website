@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daily Finance｜個人記帳</title>
+<style>
+:root {
+  --navy: #14243a;
+  --navy2: #203752;
+  --orange: #ff762f;
+  --orange-light: #fff0e7;
+  --bg: #f4f6f9;
+  --white: #ffffff;
+  --text: #263548;
+  --muted: #8b98a8;
+  --border: #e8edf2;
+  --green: #269b76;
+  --red: #e45d5d;
+  --radius: 20px;
+  --shadow: 0 8px 28px rgba(22,40,65,.06);
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+  color: var(--text);
+  background: var(--bg);
+}
+button, input, select { font: inherit; }
+button { cursor: pointer; border: 0; }
+.topbar {
+  background: var(--navy);
+  color: white;
+  padding: 17px 5%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.brand { font-size: 19px; font-weight: 800; letter-spacing: .5px; }
+.brand span { color: var(--orange); }
+.topbar-right { color: #cbd4df; font-size: 13px; }
+.container { max-width: 1250px; margin: auto; padding: 32px 24px 60px; }
+.hero {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  margin-bottom: 26px;
+  gap: 15px;
+}
+.eyebrow {
+  color: var(--orange);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+h1 { font-size: 30px; margin: 7px 0; color: var(--navy); }
+.subtitle { color: var(--muted); font-size: 14px; }
+.month-select {
+  border: 1px solid var(--border);
+  background: white;
+  padding: 11px 14px;
+  border-radius: 12px;
+  color: var(--navy);
+}
+.summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 17px;
+  margin-bottom: 25px;
+}
+.summary-card {
+  background: white;
+  border-radius: var(--radius);
+  padding: 23px;
+  box-shadow: var(--shadow);
+}
+.summary-label { color: var(--muted); font-size: 13px; }
+.summary-value { font-size: 27px; font-weight: 800; margin-top: 12px; }
+.summary-card.income .summary-value { color: var(--green); }
+.summary-card.expense .summary-value { color: var(--red); }
+.summary-card.balance .summary-value { color: var(--navy); }
+.main-grid {
+  display: grid;
+  grid-template-columns: minmax(300px, .85fr) minmax(0, 1.6fr);
+  gap: 22px;
+  align-items: start;
+}
+.panel {
+  background: white;
+  border-radius: var(--radius);
+  padding: 24px;
+  box-shadow: var(--shadow);
+  margin-bottom: 20px;
+}
+.panel-title {
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--navy);
+  margin: 0 0 20px;
+}
+.type-tabs {
+  display: flex;
+  background: #f2f4f7;
+  border-radius: 12px;
+  padding: 4px;
+  margin-bottom: 18px;
+}
+.type-tabs button {
+  flex: 1;
+  padding: 10px;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--muted);
+  font-weight: 700;
+}
+.type-tabs button.active {
+  background: var(--navy);
+  color: white;
+}
+.amount-box {
+  background: #f7f8fa;
+  border-radius: 15px;
+  padding: 18px;
+  text-align: right;
+  margin-bottom: 15px;
+}
+.amount-label { color: var(--muted); font-size: 12px; text-align: left; }
+.amount-display {
+  font-size: 34px;
+  font-weight: 800;
+  color: var(--navy);
+  min-height: 44px;
+  overflow: hidden;
+  word-break: break-all;
+}
+.keypad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 18px;
+}
+.keypad button {
+  background: #f3f5f8;
+  color: var(--navy);
+  border-radius: 11px;
+  padding: 14px 5px;
+  font-size: 18px;
+  font-weight: 700;
+  transition: .15s;
+}
+.keypad button:hover { background: #e7ebf1; }
+.keypad button.action { background: var(--orange-light); color: var(--orange); }
+.field { margin-bottom: 15px; }
+.field label {
+  display: block;
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 7px;
+}
+.field input, .field select {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  outline: none;
+  background: white;
+  color: var(--text);
+}
+.field input:focus, .field select:focus { border-color: var(--orange); }
+.primary-btn {
+  width: 100%;
+  background: var(--orange);
+  color: white;
+  padding: 14px;
+  border-radius: 12px;
+  font-weight: 800;
+  margin-top: 5px;
+}
+.primary-btn:hover { filter: brightness(.96); }
+.secondary-btn {
+  background: var(--navy);
+  color: white;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 12px;
+}
+.transaction-tools {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 17px;
+}
+.transaction-tools select {
+  flex: 1;
+  min-width: 110px;
+  border: 1px solid var(--border);
+  padding: 10px;
+  border-radius: 10px;
+  color: var(--text);
+  background: white;
+}
+.transaction {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 0;
+  border-bottom: 1px solid var(--border);
+  gap: 10px;
+}
+.transaction:last-child { border-bottom: 0; }
+.tx-left { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.tx-icon {
+  width: 43px;
+  height: 43px;
+  background: #f1f4f8;
+  border-radius: 13px;
+  display: grid;
+  place-items: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+.tx-name { font-weight: 700; font-size: 14px; }
+.tx-meta { color: var(--muted); font-size: 11px; margin-top: 5px; }
+.tx-right { text-align: right; flex-shrink: 0; }
+.tx-amount { font-weight: 800; font-size: 15px; }
+.tx-amount.income { color: var(--green); }
+.tx-amount.expense { color: var(--red); }
+.delete-btn {
+  color: #aab3bf;
+  background: transparent;
+  font-size: 11px;
+  margin-top: 5px;
+}
+.delete-btn:hover { color: var(--red); }
+.empty {
+  text-align: center;
+  color: var(--muted);
+  padding: 35px 10px;
+  font-size: 13px;
+}
+.account-list { display: grid; gap: 10px; }
+.account-item {
+  background: #f7f8fa;
+  padding: 13px;
+  border-radius: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+.account-name { font-size: 13px; font-weight: 700; }
+.account-type { color: var(--muted); font-size: 11px; margin-top: 4px; }
+.account-actions { display: flex; gap: 6px; }
+.small-btn {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 6px 9px;
+  font-size: 11px;
+  color: var(--navy);
+}
+.small-btn.delete { color: var(--red); }
+.account-add {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+}
+.account-add input {
+  flex: 1;
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+}
+.account-add button {
+  background: var(--navy);
+  color: white;
+  border-radius: 9px;
+  padding: 0 13px;
+}
+.backup-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.backup-actions button {
+  background: #f1f4f8;
+  color: var(--navy);
+  border-radius: 9px;
+  padding: 10px 12px;
+  font-size: 12px;
+  font-weight: 700;
+}
+.footer {
+  text-align: center;
+  color: #a3adba;
+  font-size: 11px;
+  padding: 20px;
+}
+@media(max-width: 800px) {
+  .main-grid { grid-template-columns: 1fr; }
+}
+@media(max-width: 560px) {
+  .container { padding: 22px 14px 40px; }
+  .summary { grid-template-columns: 1fr; gap: 10px; }
+  .summary-card { padding: 17px; }
+  .summary-value { font-size: 23px; }
+  .hero { align-items: start; flex-direction: column; }
+  h1 { font-size: 25px; }
+  .panel { padding: 18px; }
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">DAILY <span>FINANCE.</span></div>
+  <div class="topbar-right">PERSONAL MONEY MANAGER</div>
+</header>
+
+<main class="container">
+  <section class="hero">
+    <div>
+      <div class="eyebrow">MY FINANCIAL SPACE</div>
+      <h1>掌握每一筆日常。</h1>
+      <div class="subtitle">記錄生活收支，讓每一分錢都有方向。</div>
+    </div>
+    <input type="month" id="monthFilter" class="month-select">
+  </section>
+
+  <section class="summary">
+    <div class="summary-card income">
+      <div class="summary-label">本月總收入 / INCOME</div>
+      <div class="summary-value" id="totalIncome">$0</div>
+    </div>
+    <div class="summary-card expense">
+      <div class="summary-label">本月總支出 / EXPENSE</div>
+      <div class="summary-value" id="totalExpense">$0</div>
+    </div>
+    <div class="summary-card balance">
+      <div class="summary-label">本月結餘 / BALANCE</div>
+      <div class="summary-value" id="totalBalance">$0</div>
+    </div>
+  </section>
+
+  <section class="main-grid">
+    <div>
+      <div class="panel">
+        <h2 class="panel-title">新增一筆紀錄</h2>
+
+        <div class="type-tabs">
+          <button class="active" id="expenseTab" onclick="setType('expense')">支出</button>
+          <button id="incomeTab" onclick="setType('income')">收入</button>
+        </div>
+
+        <div class="amount-box">
+          <div class="amount-label">輸入金額 TWD</div>
+          <div class="amount-display" id="amountDisplay">0</div>
+        </div>
+
+        <div class="keypad">
+          <button onclick="pressKey('7')">7</button>
+          <button onclick="pressKey('8')">8</button>
+          <button onclick="pressKey('9')">9</button>
+          <button onclick="pressKey('4')">4</button>
+          <button onclick="pressKey('5')">5</button>
+          <button onclick="pressKey('6')">6</button>
+          <button onclick="pressKey('1')">1</button>
+          <button onclick="pressKey('2')">2</button>
+          <button onclick="pressKey('3')">3</button>
+          <button onclick="pressKey('00')">00</button>
+          <button onclick="pressKey('0')">0</button>
+          <button class="action" onclick="backspace()">⌫</button>
+        </div>
+
+        <div class="field">
+          <label>分類</label>
+          <select id="category"></select>
+        </div>
+
+        <div class="field">
+          <label>帳戶</label>
+          <select id="transactionAccount"></select>
+        </div>
+
+        <div class="field">
+          <label>日期</label>
+          <input type="date" id="transactionDate">
+        </div>
+
+        <div class="field">
+          <label>備註（選填）</label>
+          <input type="text" id="note" placeholder="例如：午餐、交通費...">
+        </div>
+
+        <button class="primary-btn" onclick="addTransaction()">＋ 儲存這筆紀錄</button>
+      </div>
+
+      <div class="panel">
+        <h2 class="panel-title">我的帳戶</h2>
+        <div class="account-list" id="accountList"></div>
+        <div class="account-add">
+          <input id="newAccountName" placeholder="新增帳戶名稱">
+          <button onclick="addAccount()">＋ 新增</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2 class="panel-title">資料管理</h2>
+        <div class="backup-actions">
+          <button onclick="exportCSV()">匯出 CSV</button>
+          <button onclick="exportJSON()">備份 JSON</button>
+          <button onclick="document.getElementById('importFile').click()">還原備份</button>
+          <input type="file" id="importFile" accept=".json" hidden onchange="importJSON(event)">
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="panel">
+        <h2 class="panel-title">收支明細</h2>
+        <div class="transaction-tools">
+          <select id="accountFilter" onchange="render()">
+            <option value="all">所有帳戶</option>
+          </select>
+          <select id="typeFilter" onchange="render()">
+            <option value="all">所有類型</option>
+            <option value="income">收入</option>
+            <option value="expense">支出</option>
+          </select>
+        </div>
+        <div id="transactionList"></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">DAILY FINANCE · YOUR MONEY, YOUR CHOICE</footer>
+
+<script>
+const STORAGE_KEY = "dailyFinanceData_v1";
+
+const categories = {
+  expense: ["餐飲", "交通", "購物", "娛樂", "生活用品", "學習", "醫療", "住宿", "其他"],
+  income: ["薪資", "獎學金", "零用錢", "兼職", "投資", "其他"]
+};
+
+const icons = {
+  "餐飲":"🍜", "交通":"🚌", "購物":"🛍️", "娛樂":"🎬",
+  "生活用品":"🧴", "學習":"📚", "醫療":"💊", "住宿":"🏠",
+  "薪資":"💼", "獎學金":"🎓", "零用錢":"💰", "兼職":"🧑‍💻",
+  "投資":"📈", "其他":"✦"
+};
+
+let data = loadData();
+let currentType = "expense";
+let amount = "0";
+
+function defaultData() {
+  return {
+    accounts: [
+      { id: 1, name: "現金", type: "現金" },
+      { id: 2, name: "銀行帳戶", type: "銀行" },
+      { id: 3, name: "電子支付", type: "電子支付" }
+    ],
+    transactions: []
+  };
+}
+
+function loadData() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    return saved ? JSON.parse(saved) : defaultData();
+  } catch {
+    return defaultData();
+  }
+}
+
+function saveData() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+}
+
+function todayString() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+}
+
+function formatMoney(value) {
+  return "$" + Number(value).toLocaleString("zh-TW");
+}
+
+function setType(type) {
+  currentType = type;
+  document.getElementById("expenseTab").classList.toggle("active", type === "expense");
+  document.getElementById("incomeTab").classList.toggle("active", type === "income");
+  updateCategories();
+}
+
+function updateCategories() {
+  const select = document.getElementById("category");
+  select.innerHTML = categories[currentType]
+    .map(c => `<option value="${c}">${c}</option>`).join("");
+}
+
+function pressKey(key) {
+  if (amount === "0") amount = key === "00" ? "0" : key;
+  else amount += key;
+  if (amount.length > 12) amount = amount.slice(0,12);
+  updateAmount();
+}
+
+function backspace() {
+  amount = amount.length > 1 ? amount.slice(0,-1) : "0";
+  updateAmount();
+}
+
+function updateAmount() {
+  document.getElementById("amountDisplay").textContent =
+    Number(amount).toLocaleString("zh-TW");
+}
+
+function addTransaction() {
+  const value = Number(amount);
+  if (!Number.isFinite(value) || value <= 0) {
+    alert("請先輸入有效金額！");
+    return;
+  }
+
+  const accountId = Number(document.getElementById("transactionAccount").value);
+  const account = data.accounts.find(a => a.id === accountId);
+
+  if (!account) {
+    alert("請先選擇帳戶！");
+    return;
+  }
+
+  const transaction = {
+    id: Date.now(),
+    type: currentType,
+    amount: value,
+    category: document.getElementById("category").value,
+    accountId,
+    date: document.getElementById("transactionDate").value,
+    note: document.getElementById("note").value.trim()
+  };
+
+  if (!transaction.date) {
+    alert("請選擇日期！");
+    return;
+  }
+
+  data.transactions.push(transaction);
+  saveData();
+
+  amount = "0";
+  updateAmount();
+  document.getElementById("note").value = "";
+
+  render();
+  alert("紀錄已儲存！");
+}
+
+function addAccount() {
+  const input = document.getElementById("newAccountName");
+  const name = input.value.trim();
+
+  if (!name) {
+    alert("請輸入帳戶名稱！");
+    return;
+  }
+
+  if (data.accounts.some(a => a.name === name)) {
+    alert("帳戶名稱已存在！");
+    return;
+  }
+
+  data.accounts.push({
+    id: Date.now(),
+    name,
+    type: "自訂帳戶"
+  });
+
+  input.value = "";
+  saveData();
+  render();
+}
+
+function deleteAccount(id) {
+  const used = data.transactions.some(t => t.accountId === id);
+  if (used) {
+    alert("此帳戶已有交易紀錄，不能刪除。");
+    return;
+  }
+  if (!confirm("確定刪除此帳戶？")) return;
+
+  data.accounts = data.accounts.filter(a => a.id !== id);
+  saveData();
+  render();
+}
+
+function editAccount(id) {
+  const account = data.accounts.find(a => a.id === id);
+  if (!account) return;
+
+  const newName = prompt("請輸入新的帳戶名稱：", account.name);
+  if (!newName || !newName.trim()) return;
+
+  const name = newName.trim();
+  if (data.accounts.some(a => a.id !== id && a.name === name)) {
+    alert("帳戶名稱已存在！");
+    return;
+  }
+
+  account.name = name;
+  saveData();
+  render();
+}
+
+function deleteTransaction(id) {
+  if (!confirm("確定刪除這筆紀錄？")) return;
+  data.transactions = data.transactions.filter(t => t.id !== id);
+  saveData();
+  render();
+}
+
+function renderAccounts() {
+  const list = document.getElementById("accountList");
+  const txSelect = document.getElementById("transactionAccount");
+  const filter = document.getElementById("accountFilter");
+
+  const oldTxValue = txSelect.value;
+  const oldFilterValue = filter.value || "all";
+
+  list.innerHTML = data.accounts.map(a => `
+    <div class="account-item">
+      <div>
+        <div class="account-name">${escapeHTML(a.name)}</div>
+        <div class="account-type">${escapeHTML(a.type)}</div>
+      </div>
+      <div class="account-actions">
+        <button class="small-btn" onclick="editAccount(${a.id})">修改</button>
+        <button class="small-btn delete" onclick="deleteAccount(${a.id})">刪除</button>
+      </div>
+    </div>
+  `).join("") || '<div class="empty">尚未建立帳戶</div>';
+
+  txSelect.innerHTML = data.accounts.map(a =>
+    `<option value="${a.id}">${escapeHTML(a.name)}</option>`
+  ).join("");
+
+  filter.innerHTML = '<option value="all">所有帳戶</option>' +
+    data.accounts.map(a =>
+      `<option value="${a.id}">${escapeHTML(a.name)}</option>`
+    ).join("");
+
+  if (data.accounts.some(a => String(a.id) === oldTxValue)) {
+    txSelect.value = oldTxValue;
+  }
+  if (oldFilterValue === "all" ||
+      data.accounts.some(a => String(a.id) === oldFilterValue)) {
+    filter.value = oldFilterValue;
+  }
+}
+
+function render() {
+  renderAccounts();
+
+  const month = document.getElementById("monthFilter").value;
+  const accountFilter = document.getElementById("accountFilter").value;
+  const typeFilter = document.getElementById("typeFilter").value;
+
+  let records = data.transactions.filter(t => {
+    const matchMonth = !month || t.date.startsWith(month);
+    const matchAccount = accountFilter === "all" ||
+      String(t.accountId) === accountFilter;
+    const matchType = typeFilter === "all" || t.type === typeFilter;
+    return matchMonth && matchAccount && matchType;
+  });
+
+  const monthRecords = data.transactions.filter(t =>
+    !month || t.date.startsWith(month)
+  );
+
+  const income = monthRecords
+    .filter(t => t.type === "income")
+    .reduce((sum,t) => sum + t.amount, 0);
+
+  const expense = monthRecords
+    .filter(t => t.type === "expense")
+    .reduce((sum,t) => sum + t.amount, 0);
+
+  document.getElementById("totalIncome").textContent = formatMoney(income);
+  document.getElementById("totalExpense").textContent = formatMoney(expense);
+  document.getElementById("totalBalance").textContent = formatMoney(income-expense);
+
+  records.sort((a,b) =>
+    b.date.localeCompare(a.date) || b.id-a.id
+  );
+
+  const list = document.getElementById("transactionList");
+
+  if (!records.length) {
+    list.innerHTML = '<div class="empty">目前沒有符合條件的紀錄<br>新增第一筆收支吧！</div>';
+    return;
+  }
+
+  list.innerHTML = records.map(t => {
+    const account = data.accounts.find(a => a.id === t.accountId);
+    const isIncome = t.type === "income";
+    const sign = isIncome ? "+" : "-";
+    const icon = icons[t.category] || "✦";
+
+    return `
+      <div class="transaction">
+        <div class="tx-left">
+          <div class="tx-icon">${icon}</div>
+          <div>
+            <div class="tx-name">${escapeHTML(t.category)}${t.note ? " · " + escapeHTML(t.note) : ""}</div>
+            <div class="tx-meta">
+              ${escapeHTML(t.date)} · ${escapeHTML(account ? account.name : "未知帳戶")}
+            </div>
+          </div>
+        </div>
+        <div class="tx-right">
+          <div class="tx-amount ${t.type}">${sign}${formatMoney(t.amount)}</div>
+          <button class="delete-btn" onclick="deleteTransaction(${t.id})">刪除</button>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+function escapeHTML(value) {
+  return String(value).replace(/[&<>"']/g, char => ({
+    "&":"&amp;",
+    "<":"&lt;",
+    ">":"&gt;",
+    '"':"&quot;",
+    "'":"&#39;"
+  })[char]);
+}
+
+function exportCSV() {
+  const header = ["日期","類型","分類","金額","帳戶","備註"];
+  const rows = data.transactions.map(t => {
+    const account = data.accounts.find(a => a.id === t.accountId);
+    return [
+      t.date,
+      t.type === "income" ? "收入" : "支出",
+      t.category,
+      t.amount,
+      account ? account.name : "",
+      t.note || ""
+    ];
+  });
+
+  const csv = "\uFEFF" + [header,...rows]
+    .map(row => row.map(value =>
+      '"' + String(value).replace(/"/g,'""') + '"'
+    ).join(",")).join("\n");
+
+  downloadFile(csv, "money_records.csv", "text/csv;charset=utf-8");
+}
+
+function exportJSON() {
+  const json = JSON.stringify(data, null, 2);
+  downloadFile(json, "money_backup.json", "application/json");
+}
+
+function importJSON(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const imported = JSON.parse(reader.result);
+      if (!Array.isArray(imported.accounts) ||
+          !Array.isArray(imported.transactions)) {
+        throw new Error("格式不正確");
+      }
+
+      if (!confirm("匯入備份會取代目前的紀錄，確定繼續嗎？")) return;
+
+      data = imported;
+      saveData();
+      render();
+      alert("資料還原成功！");
+    } catch {
+      alert("檔案格式錯誤，無法還原。");
+    } finally {
+      event.target.value = "";
+    }
+  };
+  reader.readAsText(file);
+}
+
+function downloadFile(content, filename, type) {
+  const blob = new Blob([content], {type});
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  link.click();
+  URL.revokeObjectURL(url);
+}
+
+document.getElementById("monthFilter").value = todayString().slice(0,7);
+document.getElementById("transactionDate").value = todayString();
+document.getElementById("monthFilter").addEventListener("change", render);
+
+updateCategories();
+render();
+</script>
+</body>
+</html>
