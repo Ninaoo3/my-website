@@ -1,813 +1,428 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="zh-TW" class="scroll-smooth">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Daily Finance｜個人記帳</title>
-<style>
-:root {
-  --navy: #14243a;
-  --navy2: #203752;
-  --orange: #ff762f;
-  --orange-light: #fff0e7;
-  --bg: #f4f6f9;
-  --white: #ffffff;
-  --text: #263548;
-  --muted: #8b98a8;
-  --border: #e8edf2;
-  --green: #269b76;
-  --red: #e45d5d;
-  --radius: 20px;
-  --shadow: 0 8px 28px rgba(22,40,65,.06);
-}
-* { box-sizing: border-box; }
-body {
-  margin: 0;
-  font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif;
-  color: var(--text);
-  background: var(--bg);
-}
-button, input, select { font: inherit; }
-button { cursor: pointer; border: 0; }
-.topbar {
-  background: var(--navy);
-  color: white;
-  padding: 17px 5%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-.brand { font-size: 19px; font-weight: 800; letter-spacing: .5px; }
-.brand span { color: var(--orange); }
-.topbar-right { color: #cbd4df; font-size: 13px; }
-.container { max-width: 1250px; margin: auto; padding: 32px 24px 60px; }
-.hero {
-  display: flex;
-  justify-content: space-between;
-  align-items: end;
-  margin-bottom: 26px;
-  gap: 15px;
-}
-.eyebrow {
-  color: var(--orange);
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 2px;
-}
-h1 { font-size: 30px; margin: 7px 0; color: var(--navy); }
-.subtitle { color: var(--muted); font-size: 14px; }
-.month-select {
-  border: 1px solid var(--border);
-  background: white;
-  padding: 11px 14px;
-  border-radius: 12px;
-  color: var(--navy);
-}
-.summary {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 17px;
-  margin-bottom: 25px;
-}
-.summary-card {
-  background: white;
-  border-radius: var(--radius);
-  padding: 23px;
-  box-shadow: var(--shadow);
-}
-.summary-label { color: var(--muted); font-size: 13px; }
-.summary-value { font-size: 27px; font-weight: 800; margin-top: 12px; }
-.summary-card.income .summary-value { color: var(--green); }
-.summary-card.expense .summary-value { color: var(--red); }
-.summary-card.balance .summary-value { color: var(--navy); }
-.main-grid {
-  display: grid;
-  grid-template-columns: minmax(300px, .85fr) minmax(0, 1.6fr);
-  gap: 22px;
-  align-items: start;
-}
-.panel {
-  background: white;
-  border-radius: var(--radius);
-  padding: 24px;
-  box-shadow: var(--shadow);
-  margin-bottom: 20px;
-}
-.panel-title {
-  font-size: 17px;
-  font-weight: 800;
-  color: var(--navy);
-  margin: 0 0 20px;
-}
-.type-tabs {
-  display: flex;
-  background: #f2f4f7;
-  border-radius: 12px;
-  padding: 4px;
-  margin-bottom: 18px;
-}
-.type-tabs button {
-  flex: 1;
-  padding: 10px;
-  border-radius: 9px;
-  background: transparent;
-  color: var(--muted);
-  font-weight: 700;
-}
-.type-tabs button.active {
-  background: var(--navy);
-  color: white;
-}
-.amount-box {
-  background: #f7f8fa;
-  border-radius: 15px;
-  padding: 18px;
-  text-align: right;
-  margin-bottom: 15px;
-}
-.amount-label { color: var(--muted); font-size: 12px; text-align: left; }
-.amount-display {
-  font-size: 34px;
-  font-weight: 800;
-  color: var(--navy);
-  min-height: 44px;
-  overflow: hidden;
-  word-break: break-all;
-}
-.keypad {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-  margin-bottom: 18px;
-}
-.keypad button {
-  background: #f3f5f8;
-  color: var(--navy);
-  border-radius: 11px;
-  padding: 14px 5px;
-  font-size: 18px;
-  font-weight: 700;
-  transition: .15s;
-}
-.keypad button:hover { background: #e7ebf1; }
-.keypad button.action { background: var(--orange-light); color: var(--orange); }
-.field { margin-bottom: 15px; }
-.field label {
-  display: block;
-  font-size: 12px;
-  color: var(--muted);
-  margin-bottom: 7px;
-}
-.field input, .field select {
-  width: 100%;
-  padding: 12px;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  outline: none;
-  background: white;
-  color: var(--text);
-}
-.field input:focus, .field select:focus { border-color: var(--orange); }
-.primary-btn {
-  width: 100%;
-  background: var(--orange);
-  color: white;
-  padding: 14px;
-  border-radius: 12px;
-  font-weight: 800;
-  margin-top: 5px;
-}
-.primary-btn:hover { filter: brightness(.96); }
-.secondary-btn {
-  background: var(--navy);
-  color: white;
-  padding: 10px 14px;
-  border-radius: 10px;
-  font-size: 12px;
-}
-.transaction-tools {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-bottom: 17px;
-}
-.transaction-tools select {
-  flex: 1;
-  min-width: 110px;
-  border: 1px solid var(--border);
-  padding: 10px;
-  border-radius: 10px;
-  color: var(--text);
-  background: white;
-}
-.transaction {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 15px 0;
-  border-bottom: 1px solid var(--border);
-  gap: 10px;
-}
-.transaction:last-child { border-bottom: 0; }
-.tx-left { display: flex; align-items: center; gap: 12px; min-width: 0; }
-.tx-icon {
-  width: 43px;
-  height: 43px;
-  background: #f1f4f8;
-  border-radius: 13px;
-  display: grid;
-  place-items: center;
-  font-size: 20px;
-  flex-shrink: 0;
-}
-.tx-name { font-weight: 700; font-size: 14px; }
-.tx-meta { color: var(--muted); font-size: 11px; margin-top: 5px; }
-.tx-right { text-align: right; flex-shrink: 0; }
-.tx-amount { font-weight: 800; font-size: 15px; }
-.tx-amount.income { color: var(--green); }
-.tx-amount.expense { color: var(--red); }
-.delete-btn {
-  color: #aab3bf;
-  background: transparent;
-  font-size: 11px;
-  margin-top: 5px;
-}
-.delete-btn:hover { color: var(--red); }
-.empty {
-  text-align: center;
-  color: var(--muted);
-  padding: 35px 10px;
-  font-size: 13px;
-}
-.account-list { display: grid; gap: 10px; }
-.account-item {
-  background: #f7f8fa;
-  padding: 13px;
-  border-radius: 12px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 8px;
-}
-.account-name { font-size: 13px; font-weight: 700; }
-.account-type { color: var(--muted); font-size: 11px; margin-top: 4px; }
-.account-actions { display: flex; gap: 6px; }
-.small-btn {
-  background: white;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 6px 9px;
-  font-size: 11px;
-  color: var(--navy);
-}
-.small-btn.delete { color: var(--red); }
-.account-add {
-  display: flex;
-  gap: 8px;
-  margin-top: 14px;
-}
-.account-add input {
-  flex: 1;
-  min-width: 0;
-  padding: 10px;
-  border: 1px solid var(--border);
-  border-radius: 9px;
-}
-.account-add button {
-  background: var(--navy);
-  color: white;
-  border-radius: 9px;
-  padding: 0 13px;
-}
-.backup-actions { display: flex; flex-wrap: wrap; gap: 8px; }
-.backup-actions button {
-  background: #f1f4f8;
-  color: var(--navy);
-  border-radius: 9px;
-  padding: 10px 12px;
-  font-size: 12px;
-  font-weight: 700;
-}
-.footer {
-  text-align: center;
-  color: #a3adba;
-  font-size: 11px;
-  padding: 20px;
-}
-@media(max-width: 800px) {
-  .main-grid { grid-template-columns: 1fr; }
-}
-@media(max-width: 560px) {
-  .container { padding: 22px 14px 40px; }
-  .summary { grid-template-columns: 1fr; gap: 10px; }
-  .summary-card { padding: 17px; }
-  .summary-value { font-size: 23px; }
-  .hero { align-items: start; flex-direction: column; }
-  h1 { font-size: 25px; }
-  .panel { padding: 18px; }
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nina | 國立臺灣師範大學 工業教育學系碩士班</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: {
+                            50: '#f0f4f8',
+                            100: '#d9e2ec',
+                            600: '#1e3a8a',
+                            800: '#1e293b',
+                            900: '#0f172a',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'Noto Sans TC', 'sans-serif'],
+                        serif: ['Playfair Display', 'Noto Serif TC', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+TC:wght@300;400;500;700&family=Playfair+Display:ital,wght@0,500;0,600;1,400&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Custom subtle styling and smooth transitions */
+        body {
+            font-family: 'Inter', 'Noto Sans TC', sans-serif;
+            background-color: #ffffff;
+            color: #0f172a;
+        }
+        .font-serif-custom {
+            font-family: 'Playfair Display', 'Noto Serif TC', serif;
+        }
+        /* Subtle grid background pattern */
+        .bg-grid-pattern {
+            background-image: radial-gradient(#1e293b 0.75px, transparent 0.75px);
+            background-size: 32px 32px;
+        }
+    </style>
 </head>
-<body>
+<body class="bg-white text-navy-900 antialiased selection:bg-navy-900 selection:text-white">
 
-<header class="topbar">
-  <div class="brand">DAILY <span>FINANCE.</span></div>
-  <div class="topbar-right">PERSONAL MONEY MANAGER</div>
-</header>
+    <!-- 導覽列 (Navbar) -->
+    <header class="fixed top-0 left-0 right-0 z-55 bg-white/90 backdrop-blur-md border-b border-navy-100 transition-all duration-300" id="navbar">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <a href="#hero" class="text-xl font-serif-custom font-semibold tracking-wider text-navy-900 hover:text-navy-600 transition-colors">
+                NINA<span class="text-navy-600 ml-1">.</span>
+            </a>
 
-<main class="container">
-  <section class="hero">
-    <div>
-      <div class="eyebrow">MY FINANCIAL SPACE</div>
-      <h1>掌握每一筆日常。</h1>
-      <div class="subtitle">記錄生活收支，讓每一分錢都有方向。</div>
-    </div>
-    <input type="month" id="monthFilter" class="month-select">
-  </section>
+            <!-- 桌面版導覽 -->
+            <nav class="hidden md:flex items-center space-x-10 text-sm font-medium tracking-wide">
+                <a href="#about" class="text-navy-900/70 hover:text-navy-900 transition-colors">關於我</a>
+                <a href="#research" class="text-navy-900/70 hover:text-navy-900 transition-colors">研究與專案</a>
+                <a href="#teaching" class="text-navy-900/70 hover:text-navy-900 transition-colors">教學與設計</a>
+                <a href="#contact" class="px-5 py-2.5 rounded-full bg-navy-900 text-white hover:bg-navy-800 transition-all duration-300 shadow-sm">聯絡我</a>
+            </nav>
 
-  <section class="summary">
-    <div class="summary-card income">
-      <div class="summary-label">本月總收入 / INCOME</div>
-      <div class="summary-value" id="totalIncome">$0</div>
-    </div>
-    <div class="summary-card expense">
-      <div class="summary-label">本月總支出 / EXPENSE</div>
-      <div class="summary-value" id="totalExpense">$0</div>
-    </div>
-    <div class="summary-card balance">
-      <div class="summary-label">本月結餘 / BALANCE</div>
-      <div class="summary-value" id="totalBalance">$0</div>
-    </div>
-  </section>
-
-  <section class="main-grid">
-    <div>
-      <div class="panel">
-        <h2 class="panel-title">新增一筆紀錄</h2>
-
-        <div class="type-tabs">
-          <button class="active" id="expenseTab" onclick="setType('expense')">支出</button>
-          <button id="incomeTab" onclick="setType('income')">收入</button>
+            <!-- 手機版選單按鈕 -->
+            <button id="menu-btn" aria-label="切換選單" class="md:hidden text-navy-900 focus:outline-none p-2">
+                <i class="fa-solid fa-bars text-xl"></i>
+            </button>
         </div>
 
-        <div class="amount-box">
-          <div class="amount-label">輸入金額 TWD</div>
-          <div class="amount-display" id="amountDisplay">0</div>
+        <!-- 手機版下拉選單 -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-b border-navy-100 px-6 py-4 space-y-3 shadow-lg transition-all">
+            <a href="#about" class="block text-navy-900/80 hover:text-navy-900 py-2 text-base mobile-link">關於我</a>
+            <a href="#research" class="block text-navy-900/80 hover:text-navy-900 py-2 text-base mobile-link">研究與專案</a>
+            <a href="#teaching" class="block text-navy-900/80 hover:text-navy-900 py-2 text-base mobile-link">教學與設計</a>
+            <a href="#contact" class="block text-navy-900 font-medium py-2 text-base mobile-link">聯絡我</a>
         </div>
+    </header>
 
-        <div class="keypad">
-          <button onclick="pressKey('7')">7</button>
-          <button onclick="pressKey('8')">8</button>
-          <button onclick="pressKey('9')">9</button>
-          <button onclick="pressKey('4')">4</button>
-          <button onclick="pressKey('5')">5</button>
-          <button onclick="pressKey('6')">6</button>
-          <button onclick="pressKey('1')">1</button>
-          <button onclick="pressKey('2')">2</button>
-          <button onclick="pressKey('3')">3</button>
-          <button onclick="pressKey('00')">00</button>
-          <button onclick="pressKey('0')">0</button>
-          <button class="action" onclick="backspace()">⌫</button>
-        </div>
-
-        <div class="field">
-          <label>分類</label>
-          <select id="category"></select>
-        </div>
-
-        <div class="field">
-          <label>帳戶</label>
-          <select id="transactionAccount"></select>
-        </div>
-
-        <div class="field">
-          <label>日期</label>
-          <input type="date" id="transactionDate">
-        </div>
-
-        <div class="field">
-          <label>備註（選填）</label>
-          <input type="text" id="note" placeholder="例如：午餐、交通費...">
-        </div>
-
-        <button class="primary-btn" onclick="addTransaction()">＋ 儲存這筆紀錄</button>
-      </div>
-
-      <div class="panel">
-        <h2 class="panel-title">我的帳戶</h2>
-        <div class="account-list" id="accountList"></div>
-        <div class="account-add">
-          <input id="newAccountName" placeholder="新增帳戶名稱">
-          <button onclick="addAccount()">＋ 新增</button>
-        </div>
-      </div>
-
-      <div class="panel">
-        <h2 class="panel-title">資料管理</h2>
-        <div class="backup-actions">
-          <button onclick="exportCSV()">匯出 CSV</button>
-          <button onclick="exportJSON()">備份 JSON</button>
-          <button onclick="document.getElementById('importFile').click()">還原備份</button>
-          <input type="file" id="importFile" accept=".json" hidden onchange="importJSON(event)">
-        </div>
-      </div>
-    </div>
-
-    <div>
-      <div class="panel">
-        <h2 class="panel-title">收支明細</h2>
-        <div class="transaction-tools">
-          <select id="accountFilter" onchange="render()">
-            <option value="all">所有帳戶</option>
-          </select>
-          <select id="typeFilter" onchange="render()">
-            <option value="all">所有類型</option>
-            <option value="income">收入</option>
-            <option value="expense">支出</option>
-          </select>
-        </div>
-        <div id="transactionList"></div>
-      </div>
-    </div>
-  </section>
-</main>
-
-<footer class="footer">DAILY FINANCE · YOUR MONEY, YOUR CHOICE</footer>
-
-<script>
-const STORAGE_KEY = "dailyFinanceData_v1";
-
-const categories = {
-  expense: ["餐飲", "交通", "購物", "娛樂", "生活用品", "學習", "醫療", "住宿", "其他"],
-  income: ["薪資", "獎學金", "零用錢", "兼職", "投資", "其他"]
-};
-
-const icons = {
-  "餐飲":"🍜", "交通":"🚌", "購物":"🛍️", "娛樂":"🎬",
-  "生活用品":"🧴", "學習":"📚", "醫療":"💊", "住宿":"🏠",
-  "薪資":"💼", "獎學金":"🎓", "零用錢":"💰", "兼職":"🧑‍💻",
-  "投資":"📈", "其他":"✦"
-};
-
-let data = loadData();
-let currentType = "expense";
-let amount = "0";
-
-function defaultData() {
-  return {
-    accounts: [
-      { id: 1, name: "現金", type: "現金" },
-      { id: 2, name: "銀行帳戶", type: "銀行" },
-      { id: 3, name: "電子支付", type: "電子支付" }
-    ],
-    transactions: []
-  };
-}
-
-function loadData() {
-  try {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    return saved ? JSON.parse(saved) : defaultData();
-  } catch {
-    return defaultData();
-  }
-}
-
-function saveData() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-}
-
-function todayString() {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
-}
-
-function formatMoney(value) {
-  return "$" + Number(value).toLocaleString("zh-TW");
-}
-
-function setType(type) {
-  currentType = type;
-  document.getElementById("expenseTab").classList.toggle("active", type === "expense");
-  document.getElementById("incomeTab").classList.toggle("active", type === "income");
-  updateCategories();
-}
-
-function updateCategories() {
-  const select = document.getElementById("category");
-  select.innerHTML = categories[currentType]
-    .map(c => `<option value="${c}">${c}</option>`).join("");
-}
-
-function pressKey(key) {
-  if (amount === "0") amount = key === "00" ? "0" : key;
-  else amount += key;
-  if (amount.length > 12) amount = amount.slice(0,12);
-  updateAmount();
-}
-
-function backspace() {
-  amount = amount.length > 1 ? amount.slice(0,-1) : "0";
-  updateAmount();
-}
-
-function updateAmount() {
-  document.getElementById("amountDisplay").textContent =
-    Number(amount).toLocaleString("zh-TW");
-}
-
-function addTransaction() {
-  const value = Number(amount);
-  if (!Number.isFinite(value) || value <= 0) {
-    alert("請先輸入有效金額！");
-    return;
-  }
-
-  const accountId = Number(document.getElementById("transactionAccount").value);
-  const account = data.accounts.find(a => a.id === accountId);
-
-  if (!account) {
-    alert("請先選擇帳戶！");
-    return;
-  }
-
-  const transaction = {
-    id: Date.now(),
-    type: currentType,
-    amount: value,
-    category: document.getElementById("category").value,
-    accountId,
-    date: document.getElementById("transactionDate").value,
-    note: document.getElementById("note").value.trim()
-  };
-
-  if (!transaction.date) {
-    alert("請選擇日期！");
-    return;
-  }
-
-  data.transactions.push(transaction);
-  saveData();
-
-  amount = "0";
-  updateAmount();
-  document.getElementById("note").value = "";
-
-  render();
-  alert("紀錄已儲存！");
-}
-
-function addAccount() {
-  const input = document.getElementById("newAccountName");
-  const name = input.value.trim();
-
-  if (!name) {
-    alert("請輸入帳戶名稱！");
-    return;
-  }
-
-  if (data.accounts.some(a => a.name === name)) {
-    alert("帳戶名稱已存在！");
-    return;
-  }
-
-  data.accounts.push({
-    id: Date.now(),
-    name,
-    type: "自訂帳戶"
-  });
-
-  input.value = "";
-  saveData();
-  render();
-}
-
-function deleteAccount(id) {
-  const used = data.transactions.some(t => t.accountId === id);
-  if (used) {
-    alert("此帳戶已有交易紀錄，不能刪除。");
-    return;
-  }
-  if (!confirm("確定刪除此帳戶？")) return;
-
-  data.accounts = data.accounts.filter(a => a.id !== id);
-  saveData();
-  render();
-}
-
-function editAccount(id) {
-  const account = data.accounts.find(a => a.id === id);
-  if (!account) return;
-
-  const newName = prompt("請輸入新的帳戶名稱：", account.name);
-  if (!newName || !newName.trim()) return;
-
-  const name = newName.trim();
-  if (data.accounts.some(a => a.id !== id && a.name === name)) {
-    alert("帳戶名稱已存在！");
-    return;
-  }
-
-  account.name = name;
-  saveData();
-  render();
-}
-
-function deleteTransaction(id) {
-  if (!confirm("確定刪除這筆紀錄？")) return;
-  data.transactions = data.transactions.filter(t => t.id !== id);
-  saveData();
-  render();
-}
-
-function renderAccounts() {
-  const list = document.getElementById("accountList");
-  const txSelect = document.getElementById("transactionAccount");
-  const filter = document.getElementById("accountFilter");
-
-  const oldTxValue = txSelect.value;
-  const oldFilterValue = filter.value || "all";
-
-  list.innerHTML = data.accounts.map(a => `
-    <div class="account-item">
-      <div>
-        <div class="account-name">${escapeHTML(a.name)}</div>
-        <div class="account-type">${escapeHTML(a.type)}</div>
-      </div>
-      <div class="account-actions">
-        <button class="small-btn" onclick="editAccount(${a.id})">修改</button>
-        <button class="small-btn delete" onclick="deleteAccount(${a.id})">刪除</button>
-      </div>
-    </div>
-  `).join("") || '<div class="empty">尚未建立帳戶</div>';
-
-  txSelect.innerHTML = data.accounts.map(a =>
-    `<option value="${a.id}">${escapeHTML(a.name)}</option>`
-  ).join("");
-
-  filter.innerHTML = '<option value="all">所有帳戶</option>' +
-    data.accounts.map(a =>
-      `<option value="${a.id}">${escapeHTML(a.name)}</option>`
-    ).join("");
-
-  if (data.accounts.some(a => String(a.id) === oldTxValue)) {
-    txSelect.value = oldTxValue;
-  }
-  if (oldFilterValue === "all" ||
-      data.accounts.some(a => String(a.id) === oldFilterValue)) {
-    filter.value = oldFilterValue;
-  }
-}
-
-function render() {
-  renderAccounts();
-
-  const month = document.getElementById("monthFilter").value;
-  const accountFilter = document.getElementById("accountFilter").value;
-  const typeFilter = document.getElementById("typeFilter").value;
-
-  let records = data.transactions.filter(t => {
-    const matchMonth = !month || t.date.startsWith(month);
-    const matchAccount = accountFilter === "all" ||
-      String(t.accountId) === accountFilter;
-    const matchType = typeFilter === "all" || t.type === typeFilter;
-    return matchMonth && matchAccount && matchType;
-  });
-
-  const monthRecords = data.transactions.filter(t =>
-    !month || t.date.startsWith(month)
-  );
-
-  const income = monthRecords
-    .filter(t => t.type === "income")
-    .reduce((sum,t) => sum + t.amount, 0);
-
-  const expense = monthRecords
-    .filter(t => t.type === "expense")
-    .reduce((sum,t) => sum + t.amount, 0);
-
-  document.getElementById("totalIncome").textContent = formatMoney(income);
-  document.getElementById("totalExpense").textContent = formatMoney(expense);
-  document.getElementById("totalBalance").textContent = formatMoney(income-expense);
-
-  records.sort((a,b) =>
-    b.date.localeCompare(a.date) || b.id-a.id
-  );
-
-  const list = document.getElementById("transactionList");
-
-  if (!records.length) {
-    list.innerHTML = '<div class="empty">目前沒有符合條件的紀錄<br>新增第一筆收支吧！</div>';
-    return;
-  }
-
-  list.innerHTML = records.map(t => {
-    const account = data.accounts.find(a => a.id === t.accountId);
-    const isIncome = t.type === "income";
-    const sign = isIncome ? "+" : "-";
-    const icon = icons[t.category] || "✦";
-
-    return `
-      <div class="transaction">
-        <div class="tx-left">
-          <div class="tx-icon">${icon}</div>
-          <div>
-            <div class="tx-name">${escapeHTML(t.category)}${t.note ? " · " + escapeHTML(t.note) : ""}</div>
-            <div class="tx-meta">
-              ${escapeHTML(t.date)} · ${escapeHTML(account ? account.name : "未知帳戶")}
+    <!-- 1. Hero 區段 -->
+    <section id="hero" class="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden bg-grid-pattern bg-[opacity:0.03]">
+        <!-- 裝飾性光晕背景 -->
+        <div class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-navy-50 rounded-full blur-3xl opacity-55 pointer-events-none -z-10"></div>
+        
+        <div class="max-w-5xl mx-auto px-6 py-20 text-center z-10">
+            <div class="inline-flex items-center space-x-2 px-4 py-1.5 rounded-full bg-navy-50 border border-navy-100 mb-8 animate-fade-in">
+                <span class="w-2 h-2 rounded-full bg-navy-600 animate-pulse"></span>
+                <span class="text-xs uppercase tracking-widest text-navy-800 font-medium">NTNU Industrial Education</span>
             </div>
-          </div>
+
+            <h1 class="text-5xl sm:text-6xl md:text-7xl font-serif-custom font-medium tracking-tight text-navy-900 mb-6 leading-tight">
+                Hi, I'm Nina Chiang.
+            </h1>
+
+            <p class="text-lg sm:text-xl text-navy-900/70 max-w-2xl mx-auto font-light leading-relaxed mb-12">
+                國立臺灣師範大學 工業教育學系碩士班技職教育組。<br>
+
+                致力於結合<span class="text-navy-900 font-medium">技職教育</span>、<span class="text-navy-900 font-medium">服裝設計</span>，探索美學與實作的無界可能。
+            </p>
+
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <a href="#research" class="w-full sm:w-auto px-8 py-4 rounded-full bg-navy-900 text-white font-medium hover:bg-navy-800 transition-all duration-300 shadow-lg shadow-navy-900/10 flex items-center justify-center space-x-3">
+                    <span>探索研究與專案</span>
+                    <i class="fa-solid fa-arrow-right text-xs"></i>
+                </a>
+                <a href="#contact" class="w-full sm:w-auto px-8 py-4 rounded-full border border-navy-200 text-navy-900 font-medium hover:bg-navy-50 transition-all duration-300 flex items-center justify-center">
+                    <span>與我聯繫</span>
+                </a>
+            </div>
         </div>
-        <div class="tx-right">
-          <div class="tx-amount ${t.type}">${sign}${formatMoney(t.amount)}</div>
-          <button class="delete-btn" onclick="deleteTransaction(${t.id})">刪除</button>
+
+        <!-- 向下滾動提示 -->
+        <div class="absolute bottom-8 left-1/2 -translate-x-1/2 hidden md:flex flex-col items-center space-y-2 text-navy-900/40">
+            <span class="text-xs tracking-widest uppercase">Scroll</span>
+            <div class="w-4 h-8 rounded-full border-2 border-navy-900/20 flex items-start justify-center p-1">
+                <div class="w-1 h-2 rounded-full bg-navy-900/60 animate-bounce"></div>
+            </div>
         </div>
-      </div>
-    `;
-  }).join("");
-}
+    </section>
 
-function escapeHTML(value) {
-  return String(value).replace(/[&<>"']/g, char => ({
-    "&":"&amp;",
-    "<":"&lt;",
-    ">":"&gt;",
-    '"':"&quot;",
-    "'":"&#39;"
-  })[char]);
-}
+    <!-- 2. About Me / 關於我 -->
+    <section id="about" class="py-28 bg-navy-50/50 border-t border-b border-navy-100">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                
+                <!-- 左側個人特質標語 -->
+                <div class="lg:col-span-5 space-y-6">
+                    <div class="inline-block text-xs uppercase tracking-widest text-navy-600 font-semibold bg-white px-3 py-1 rounded border border-navy-100">
+                        About Me
+                    </div>
+                    <h2 class="text-3xl sm:text-4xl font-serif-custom font-medium text-navy-900 leading-snug">
+                        在美學與工藝中，<br>尋找技職教育的革新路徑。
+                    </h2>
+                    <p class="text-navy-900/70 leading-relaxed font-light">
+                        我是 Nina，現正於國立臺灣師範大學工業教育學系碩士班就讀，主修技職教育組。我的背景交織於現代服裝設計與技職教育實務，深信透過系統化的教案設計與綠色永續思維，能為未來技職人才培育帶來全新動能。
+                    </p>
+                    <div class="pt-2 grid grid-cols-2 gap-4 border-t border-navy-200/60">
+                        <div>
+                            <span class="block text-2xl font-serif-custom font-semibold text-navy-900">NTNU</span>
+                            <span class="text-xs text-navy-900/60">工業教育學系碩士班</span>
+                        </div>
+                        <div>
+                            <span class="block text-2xl font-serif-custom font-semibold text-navy-900">VET</span>
+                            <span class="text-xs text-navy-900/60">技職教育與永續發展</span>
+                        </div>
+                    </div>
+                </div>
 
-function exportCSV() {
-  const header = ["日期","類型","分類","金額","帳戶","備註"];
-  const rows = data.transactions.map(t => {
-    const account = data.accounts.find(a => a.id === t.accountId);
-    return [
-      t.date,
-      t.type === "income" ? "收入" : "支出",
-      t.category,
-      t.amount,
-      account ? account.name : "",
-      t.note || ""
-    ];
-  });
+                <!-- 右側核心價值卡片 -->
+                <div class="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div class="bg-white p-8 rounded-2xl border border-navy-100 shadow-sm hover:shadow-md transition-shadow">
+                        <div class="w-12 h-12 rounded-xl bg-navy-50 flex items-center justify-center text-navy-600 mb-6 text-xl">
+                            <i class="fa-solid fa-graduation-cap"></i>
+                        </div>
+                        <h3 class="text-lg font-semibold text-navy-900 mb-2">技職教育願景</h3>
+                        <p class="text-sm text-navy-900/70 leading-relaxed font-light">
+                            關注技職體系的課程轉型，探討如何將新興數位工具與產業需求深度對接，提升實作力與競爭力。
+                        </p>
+                    </div>
 
-  const csv = "\uFEFF" + [header,...rows]
-    .map(row => row.map(value =>
-      '"' + String(value).replace(/"/g,'""') + '"'
-    ).join(",")).join("\n");
+                    <div class="bg-white p-8 rounded-2xl border border-navy-100 shadow-sm hover:shadow-md transition-shadow">
+                        <div class="w-12 h-12 rounded-xl bg-navy-50 flex items-center justify-center text-navy-600 mb-6 text-xl">
+                            <i class="fa-solid fa-shirt"></i>
+                        </div>
+                        <h3 class="text-lg font-semibold text-navy-900 mb-2">服裝與時尚設計</h3>
+                        <p class="text-sm text-navy-900/70 leading-relaxed font-light">
+                            具備專業服裝設計背景，擅長將美學構思轉化為結構嚴謹、兼具實穿性與當代美感的服飾創作。
+                        </p>
+                    </div>
 
-  downloadFile(csv, "money_records.csv", "text/csv;charset=utf-8");
-}
+                    <div class="bg-white p-8 rounded-2xl border border-navy-100 shadow-sm hover:shadow-md transition-shadow">
+                        <div class="w-12 h-12 rounded-xl bg-navy-50 flex items-center justify-center text-navy-600 mb-6 text-xl">
+                            <i class="fa-solid fa-leaf"></i>
+                        </div>
+                        <h3 class="text-lg font-semibold text-navy-900 mb-2">綠色技能教學</h3>
+                        <p class="text-sm text-navy-900/70 leading-relaxed font-light">
+                            推動永續時尚與環保材料應用，將永續發展目標（SDGs）融入技職實作教學與課程單元中。
+                        </p>
+                    </div>
 
-function exportJSON() {
-  const json = JSON.stringify(data, null, 2);
-  downloadFile(json, "money_backup.json", "application/json");
-}
+                    <div class="bg-white p-8 rounded-2xl border border-navy-100 shadow-sm hover:shadow-md transition-shadow">
+                        <div class="w-12 h-12 rounded-xl bg-navy-50 flex items-center justify-center text-navy-600 mb-6 text-xl">
+                            <i class="fa-solid fa-laptop-code"></i>
+                        </div>
+                        <h3 class="text-lg font-semibold text-navy-900 mb-2">數位教學工具</h3>
+                        <p class="text-sm text-navy-900/70 leading-relaxed font-light">
+                            善用現代數位科技與網頁工具輔助教學互動，打造無縫、高效率的線上與線下學習體驗。
+                        </p>
+                    </div>
+                </div>
 
-function importJSON(event) {
-  const file = event.target.files[0];
-  if (!file) return;
+            </div>
+        </div>
+    </section>
 
-  const reader = new FileReader();
-  reader.onload = () => {
-    try {
-      const imported = JSON.parse(reader.result);
-      if (!Array.isArray(imported.accounts) ||
-          !Array.isArray(imported.transactions)) {
-        throw new Error("格式不正確");
-      }
+    <!-- 3. Research & Projects / 研究與專案 -->
+    <section id="research" class="py-28 bg-white">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="text-center max-w-2xl mx-auto mb-20">
+                <span class="text-xs uppercase tracking-widest text-navy-600 font-semibold bg-navy-50 px-3 py-1 rounded border border-navy-100 inline-block mb-3">
+                    Research & Projects
+                </span>
+                <h2 class="text-3xl sm:text-4xl font-serif-custom font-medium text-navy-900">
+                    研究領域與學術專案
+                </h2>
+                <p class="text-navy-900/70 mt-3 font-light">
+                    聚焦於技職教育變革、永續時尚及數位化教學實務之深度研究。
+                </p>
+            </div>
 
-      if (!confirm("匯入備份會取代目前的紀錄，確定繼續嗎？")) return;
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- 研究專案 1 -->
+                <div class="group bg-white border border-navy-100 rounded-2xl p-8 flex flex-col justify-between hover:border-navy-900 transition-all duration-300 shadow-sm">
+                    <div>
+                        <div class="flex items-center justify-between mb-6">
+                            <span class="text-xs font-medium px-3 py-1 rounded-full bg-navy-50 text-navy-800">碩士研究</span>
+                            <span class="text-xs text-navy-900/40">2025 - Present</span>
+                        </div>
+                        <h3 class="text-xl font-serif-custom font-semibold text-navy-900 group-hover:text-navy-600 transition-colors mb-3">
+                            技職教育中綠色技能與永續時尚之課程發展
+                        </h3>
+                        <p class="text-sm text-navy-900/70 font-light leading-relaxed mb-6">
+                            探討國內外技職體系如何導入綠色設計與環保材料應用，建構具備實踐力的永續服裝設計教案與評量指標。
+                        </p>
+                    </div>
+                    <div class="pt-4 border-t border-navy-100 flex items-center justify-between text-xs text-navy-900/60 font-medium">
+                        <span>關鍵字：永續發展、教案設計</span>
+                        <i class="fa-solid fa-arrow-right-long text-navy-900 group-hover:translate-x-1 transition-transform"></i>
+                    </div>
+                </div>
 
-      data = imported;
-      saveData();
-      render();
-      alert("資料還原成功！");
-    } catch {
-      alert("檔案格式錯誤，無法還原。");
-    } finally {
-      event.target.value = "";
-    }
-  };
-  reader.readAsText(file);
-}
+                <!-- 研究專案 2 -->
+                <div class="group bg-white border border-navy-100 rounded-2xl p-8 flex flex-col justify-between hover:border-navy-900 transition-all duration-300 shadow-sm">
+                    <div>
+                        <div class="flex items-center justify-between mb-6">
+                            <span class="text-xs font-medium px-3 py-1 rounded-full bg-navy-50 text-navy-800">產學合作</span>
+                            <span class="text-xs text-navy-900/40">2024 - 2025</span>
+                        </div>
+                        <h3 class="text-xl font-serif-custom font-semibold text-navy-900 group-hover:text-navy-600 transition-colors mb-3">
+                            服裝設計實作教學之數位工具應用研究
+                        </h3>
+                        <p class="text-sm text-navy-900/70 font-light leading-relaxed mb-6">
+                            評估數位模擬與線上協作工具在服裝構造教學中的成效，提升學生對版型結構與立體剪裁的空間理解力。
+                        </p>
+                    </div>
+                    <div class="pt-4 border-t border-navy-100 flex items-center justify-between text-xs text-navy-900/60 font-medium">
+                        <span>關鍵字：數位教學、立體剪裁</span>
+                        <i class="fa-solid fa-arrow-right-long text-navy-900 group-hover:translate-x-1 transition-transform"></i>
+                    </div>
+                </div>
 
-function downloadFile(content, filename, type) {
-  const blob = new Blob([content], {type});
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = filename;
-  link.click();
-  URL.revokeObjectURL(url);
-}
+                <!-- 研究專案 3 -->
+                <div class="group bg-white border border-navy-100 rounded-2xl p-8 flex flex-col justify-between hover:border-navy-900 transition-all duration-300 shadow-sm">
+                    <div>
+                        <div class="flex items-center justify-between mb-6">
+                            <span class="text-xs font-medium px-3 py-1 rounded-full bg-navy-50 text-navy-800">專題論文</span>
+                            <span class="text-xs text-navy-900/40">2024</span>
+                        </div>
+                        <h3 class="text-xl font-serif-custom font-semibold text-navy-900 group-hover:text-navy-600 transition-colors mb-3">
+                            技職體系跨領域美感教育與實作效能之探討
+                        </h3>
+                        <p class="text-sm text-navy-900/70 font-light leading-relaxed mb-6">
+                            分析工業教育與美感素養結合的教學模式，透過質化與量化研究檢視學生學習動機與職業技能養成。
+                        </p>
+                    </div>
+                    <div class="pt-4 border-t border-navy-100 flex items-center justify-between text-xs text-navy-900/60 font-medium">
+                        <span>關鍵字：跨領域、美感素養</span>
+                        <i class="fa-solid fa-arrow-right-long text-navy-900 group-hover:translate-x-1 transition-transform"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-document.getElementById("monthFilter").value = todayString().slice(0,7);
-document.getElementById("transactionDate").value = todayString();
-document.getElementById("monthFilter").addEventListener("change", render);
+    <!-- 4. Teaching & Design / 教學與設計作品 -->
+    <section id="teaching" class="py-28 bg-navy-50/50 border-t border-b border-navy-100">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="text-center max-w-2xl mx-auto mb-20">
+                <span class="text-xs uppercase tracking-widest text-navy-600 font-semibold bg-white px-3 py-1 rounded border border-navy-100 inline-block mb-3">
+                    Teaching & Design Portfolio
+                </span>
+                <h2 class="text-3xl sm:text-4xl font-serif-custom font-medium text-navy-900">
+                    教學經驗與設計作品
+                </h2>
+                <p class="text-navy-900/70 mt-3 font-light">
+                    結合時尚美學與嚴謹技職訓練的精選教案與服裝設計作品集。
+                </p>
+            </div>
 
-updateCategories();
-render();
-</script>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- 作品項目 1 -->
+                <div class="bg-white rounded-2xl border border-navy-100 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                    <div class="h-64 bg-navy-900/5 flex items-center justify-center relative overflow-hidden group">
+                        <!-- 裝飾性幾何線條模擬設計感 -->
+                        <div class="absolute inset-0 bg-gradient-to-br from-navy-900/10 to-transparent"></div>
+                        <div class="text-center p-6 relative z-10">
+                            <i class="fa-solid fa-shirt text-4xl text-navy-600 mb-3"></i>
+                            <h4 class="font-serif-custom text-xl font-medium text-navy-900">永續時尚系列設計</h4>
+                        </div>
+                        <div class="absolute inset-0 bg-navy-900/80 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center p-6 text-center text-white">
+                            <p class="text-sm font-light">
+                                以零廢棄剪裁（Zero-Waste Cutting）為核心理念，結合天然環保面料與當代幾何線條，展現兼具環保與高雅的服裝美學。
+                            </p>
+                        </div>
+                    </div>
+                    <div class="p-8">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="text-xl font-serif-custom font-semibold text-navy-900">環保服裝設計與結構美學</h3>
+                            <span class="text-xs uppercase tracking-wider text-navy-600 font-medium">Design Project</span>
+                        </div>
+                        <p class="text-sm text-navy-900/70 font-light leading-relaxed">
+                            運用立體剪裁與模組化拼布技巧，減少製衣過程中的布料浪費，同時作為技職服裝實作課程的示範教具。
+                        </p>
+                    </div>
+                </div>
+
+                <!-- 作品項目 2 -->
+                <div class="bg-white rounded-2xl border border-navy-100 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                    <div class="h-64 bg-navy-900/5 flex items-center justify-center relative overflow-hidden group">
+                        <div class="absolute inset-0 bg-gradient-to-br from-navy-900/10 to-transparent"></div>
+                        <div class="text-center p-6 relative z-10">
+                            <i class="fa-solid fa-book-open-reader text-4xl text-navy-600 mb-3"></i>
+                            <h4 class="font-serif-custom text-xl font-medium text-navy-900">技職綠色技能教案</h4>
+                        </div>
+                        <div class="absolute inset-0 bg-navy-900/80 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center p-6 text-center text-white">
+                            <p class="text-sm font-light">
+                                專為技職院校服裝設計科系設計的模組化教學方案，引導學生從原料選擇到成衣回收進行全生命週期思考。
+                            </p>
+                        </div>
+                    </div>
+                    <div class="p-8">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="text-xl font-serif-custom font-semibold text-navy-900">綠色技能與模組化教案設計</h3>
+                            <span class="text-xs uppercase tracking-wider text-navy-600 font-medium">Curriculum</span>
+                        </div>
+                        <p class="text-sm text-navy-900/70 font-light leading-relaxed">
+                            包含詳細的教學目標、實作步驟指引及評量規準（Rubrics），已於多場教學實習與工作坊中實際應用並獲得好評。
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. Contact / 聯絡方式 -->
+    <section id="contact" class="py-28 bg-white">
+        <div class="max-w-4xl mx-auto px-6">
+            <div class="bg-navy-900 rounded-3xl p-8 sm:p-16 text-white text-center relative overflow-hidden shadow-2xl">
+                <!-- 裝飾背景圈 -->
+                <div class="absolute -top-24 -right-24 w-96 h-96 bg-navy-800 rounded-full blur-2xl opacity-50 pointer-events-none"></div>
+                <div class="absolute -bottom-24 -left-24 w-96 h-96 bg-navy-600 rounded-full blur-2xl opacity-30 pointer-events-none"></div>
+
+                <div class="relative z-10 max-w-xl mx-auto">
+                    <span class="text-xs uppercase tracking-widest text-navy-100/70 font-medium bg-navy-800/80 px-3 py-1 rounded border border-navy-700 inline-block mb-4">
+                        Get in Touch
+                    </span>
+                    <h2 class="text-3xl sm:text-4xl font-serif-custom font-medium mb-4">
+                        期待與您交流與合作
+                    </h2>
+                    <p class="text-navy-100/80 font-light text-sm sm:text-base leading-relaxed mb-10">
+                        若您對技職教育、服裝設計教學或綠色技能研究有任何問題、交流邀約或合作想法，歡迎隨時與我聯繫。
+                    </p>
+
+                    <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-10">
+                        <a href="mailto:nina@ntnu.edu.tw" class="w-full sm:w-auto px-8 py-4 rounded-full bg-white text-navy-900 font-medium hover:bg-navy-50 transition-colors flex items-center justify-center space-x-3 shadow-lg">
+                            <i class="fa-solid fa-envelope text-navy-600"></i>
+                            <span>nina@ntnu.edu.tw</span>
+                        </a>
+                        <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" class="w-full sm:w-auto px-8 py-4 rounded-full border border-navy-700 bg-navy-800/50 text-white font-medium hover:bg-navy-800 transition-colors flex items-center justify-center space-x-3">
+                            <i class="fa-brands fa-linkedin text-lg"></i>
+                            <span>LinkedIn 專業連結</span>
+                        </a>
+                    </div>
+
+                    <!-- 社群連結預留 -->
+                    <div class="flex items-center justify-center space-x-6 text-navy-100/60">
+                        <a href="#" aria-label="GitHub" class="hover:text-white transition-colors p-2 text-xl"><i class="fa-brands fa-github"></i></a>
+                        <a href="#" aria-label="ResearchGate" class="hover:text-white transition-colors p-2 text-xl"><i class="fa-solid fa-book-bookmark"></i></a>
+                        <a href="#" aria-label="Instagram" class="hover:text-white transition-colors p-2 text-xl"><i class="fa-brands fa-instagram"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 頁尾 (Footer) -->
+    <footer class="bg-navy-900 text-navy-100/50 py-12 border-t border-navy-800">
+        <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between text-xs tracking-wide">
+            <p>&copy; 2026 Nina. 國立臺灣師範大學 工業教育學系碩士班. All Rights Reserved.</p>
+            <p class="mt-4 md:mt-0 font-light">Chic & Minimalist Educational Portfolio</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript 互動邏輯 -->
+    <script>
+        // 手機版漢堡選單切換
+        const menuBtn = document.getElementById('menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const mobileLinks = document.querySelectorAll('.mobile-link');
+
+        menuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // 點擊選單項目後自動收起選單
+        mobileLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.add('hidden');
+            });
+        });
+
+        // 導覽列滾動陰影變化
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 20) {
+                navbar.classList.add('shadow-md', 'bg-white/95');
+            } else {
+                navbar.classList.remove('shadow-md', 'bg-white/90');
+            }
+        });
+    </script>
 </body>
 </html>
